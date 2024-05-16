@@ -6,7 +6,7 @@ import Rate from './Rate'
 import formatCurrency from '../formatCurrency'
 import { useState } from 'react'
 
-const TableRow = ({initialIsEditing, initialDescription, initialRate, initialHours, deleteInvoiceRow}) => {
+const TableRow = ({id, editInvoiceRow, initialIsEditing, initialDescription, initialRate, initialHours, deleteInvoiceRow}) => {
 
   const [isEditing, setIsEditing] = useState(initialIsEditing)
   const [description, setDescription] = useState(initialDescription)

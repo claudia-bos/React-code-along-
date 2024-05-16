@@ -7,57 +7,79 @@ import TableRow from './TableRow'
 import TableHeader from './TableHeader'
 import AddButtons from './AddButtons'
 import './InvoiceTable.css'
+import axios from 'axios'
+ 
 
+//we send this to index.js:
 
-const initialData = [
+// const initialData = [
 
-  { id: 0, description: 'Content plan', rate: 50, hours: 4 },
-  { id: 1, description: 'Copy writing', rate: 50, hours: 2 },
-  { id: 2, description: 'Website design', rate: 50, hours: 5 },
-  { id: 3, description: 'Website development', rate: 100, hours: 5 },
-];
+//   { id: 0, description: 'Content plan', rate: 50, hours: 4 },
+//   { id: 1, description: 'Copy writing', rate: 50, hours: 2 },
+//   { id: 2, description: 'Website design', rate: 50, hours: 5 },
+//   { id: 3, description: 'Website development', rate: 100, hours: 5 },
+// ];
 
-let globalId = 4
+// let globalId = 4
 
 const InvoiceTable = () => {
 
-  const [testData, setTestData] = useState(initialData)
+  const [testData, setTestData] = useState([])
 
   useEffect(() => {
     console.log('Test Data Array', testData)
-  }, [testData])
+
+    axios.get('/invoices')
+      .then((res) => {
+        setTestData(res.data)
+      })
+
+  }, [])
 
 
   const addInvoiceRow = () => {
-    const testDataCopy = [...testData]
+    // const testDataCopy = [...testData]
 
     const newRow = {
-      id: globalId,
+      // id: globalId,
       description: 'New Job goes here',
       rate: 0,
-      hours: 0
+      hours: 0,
+      isEditing: true
     }
 
-    testDataCopy.push(newRow)
+    axios.post('/newInvoice', newRow)
+    .then((res) => {
+      // console.log('for claudia', res.data);
+      setTestData(res.data)
+    })
 
-    setTestData(testDataCopy)
-
-    globalId++
+    // testDataCopy.push(newRow)
+    // setTestData(testDataCopy)
+    // globalId++
+    //this part has gone to controller.js
   }
 
-  const deleteInvoiceRow = (id) => {
+  const deleteInvoiceRow = async (id) => {
     console.log(`delete function hit for id: ${id}`)
     //make a copy of testData array
     //Filter out all elements that have a matching id
     //set testData state to be the new, edited array
 
-    const testDataCopy = [...testData]
+    const newInvoiceArray = await axios.delete(`/badInvoice/${id}`)
+    
+    console.log('new invoice array', newInvoiceArray);
+    
+    setTestData(newInvoiceArray.data)
+    
+    
+    // const testDataCopy = [...testData]
 
 
-    const filterdArray = testDataCopy.filter((el) => el.id != id)
+    // const filterdArray = testDataCopy.filter((el) => el.id != id)
 
 
-    setTestData(filterdArray)
+    // setTestData(filterdArray)
 
   }
 
@@ -67,18 +89,23 @@ const InvoiceTable = () => {
     console.log('body object:', body)
     
 
-    const testDataCopy = [...testData]
+    // const testDataCopy = [...testData]
 
-    const index = testDataCopy.findIndex((el) => el.id === id)
+    // const index = testDataCopy.findIndex((el) => el.id === id)
 
-    testDataCopy.splice(index, 1, body)
+    // testDataCopy.splice(index, 1, body)
 
-    setTestData(testDataCopy)
+    // setTestData(testDataCopy)
+
+    axios.put(`/updateInvoice/${id}`, body)
+    .then((res) => {
+      setTestData(res.data)
+    })
   }
 
   const rows = testData.map((el) => <TableRow 
 
-    initialIsEditing={false}
+    initialIsEditing={el.isEditing}
     initialDescription={el.description}
     initialRate={el.rate}
     initialHours={el.hours}
